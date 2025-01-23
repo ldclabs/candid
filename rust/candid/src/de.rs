@@ -273,22 +273,22 @@ macro_rules! check {
         }
     }};
 }
-#[cfg(not(target_arch = "wasm32"))]
-macro_rules! check_recursion {
-    ($this:ident $($body:tt)*) => {
-        $this.recursion_depth += 1;
-        match stacker::remaining_stack() {
-            Some(size) if size < 32768 => return Err(Error::msg(format!("Recursion limit exceeded at depth {}", $this.recursion_depth))),
-            None if $this.recursion_depth > 512 => return Err(Error::msg(format!("Recursion limit exceeded at depth {}. Cannot detect stack size, use a conservative bound", $this.recursion_depth))),
-            _ => (),
-        }
-        let __ret = { $this $($body)* };
-        $this.recursion_depth -= 1;
-        __ret
-    };
-}
+// #[cfg(not(target_arch = "wasm32"))]
+// macro_rules! check_recursion {
+//     ($this:ident $($body:tt)*) => {
+//         $this.recursion_depth += 1;
+//         match stacker::remaining_stack() {
+//             Some(size) if size < 16384 => return Err(Error::msg(format!("Recursion limit exceeded at depth {}, stack size: {}", $this.recursion_depth, size))),
+//             None if $this.recursion_depth > 512 => return Err(Error::msg(format!("Recursion limit exceeded at depth {}. Cannot detect stack size, use a conservative bound", $this.recursion_depth))),
+//             _ => (),
+//         }
+//         let __ret = { $this $($body)* };
+//         $this.recursion_depth -= 1;
+//         __ret
+//     };
+// }
 // No need to check recursion depth for wasm32, because canisters are running in a sandbox
-#[cfg(target_arch = "wasm32")]
+// #[cfg(target_arch = "wasm32")]
 macro_rules! check_recursion {
     ($this:ident $($body:tt)*) => {
         $this $($body)*
